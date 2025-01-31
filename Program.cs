@@ -17,16 +17,22 @@ builder.Services.AddDbContext<DBContext>(options => options.UseSqlServer(builder
 //builder.Services.AddScoped<ILoginRepository, LoginRepository>();  // Correct registration
 builder.Services.AddScoped<ILoginRepository>(provider =>
 {
-    // Retrieve the connection string from IConfiguration
     var connectionString = provider.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection");
 
-    // Resolve the DbContext from the container
     var dbContext = provider.GetRequiredService<DBContext>();
 
-    // Return a new instance of LoginRepository with both the DBContext and the connection string
     return new LoginRepository(dbContext, connectionString);
 });
-builder.Services.AddScoped<ILoginService, LoginService>();        // Correct registration
+builder.Services.AddScoped<IAttendanceRepository>(provider =>
+{
+    var connectionString = provider.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection");
+
+    var dbContext = provider.GetRequiredService<DBContext>();
+
+    return new AttendanceRepository(dbContext, connectionString);
+});
+builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -41,7 +47,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]))  // Secret key from appsettings.json
         };
     });
-
+builder.Services.AddAuthentication("Cookies")
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Login";  // Redirect to login if not authenticated
+        options.LogoutPath = "/Login/Logout";  // Redirect to login if not authenticated
+    });
+builder.Services.AddSession(options =>
+{
+    // Optional: Set session timeout
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true; // Ensure session cookie is HttpOnly
+    options.Cookie.IsEssential = true; // Mark session cookie as essential
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -51,7 +69,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
+app.UseSession();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 /*app.UseExceptionHandler(errorApp =>
@@ -79,6 +97,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Login}/{action=Index}");
+    pattern: "{controller=Home}/{action=Index}");
 
 app.Run();

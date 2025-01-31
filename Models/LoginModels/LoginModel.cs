@@ -2,13 +2,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace FarmOps.Models
+namespace FarmOps.Models.LoginModels
 {
     [Table("tbl_login", Schema = "dbo")]
     public class LoginModel
     {
         [Key]
-        [Column("Id",TypeName = "nvarchar(20)")]
+        [Column("Id", TypeName = "nvarchar(20)")]
         [Required]
         [ScaffoldColumn(false)]
         public string UserId { get; set; }

@@ -1,4 +1,29 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var isLoggedIn = Context.Session.GetString("FarmOpsUserId") != null;
+}
+@if (@ViewBag.Message != null && @ViewBag.Message != "")
+{
+    if (ViewBag.Message.Contains("SUCCESS"))
+    {
+        <div id="msg" class="alert alert-success alert-dismissible fade show" style="position: fixed; top: 10%; left: 50%; transform: translateX(-50%); z-index: 1050; width: auto;">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            @ViewBag.Message
+        </div>
+    }
+    else
+    {
+        <div id="msg" class="alert alert-danger alert-dismissible fade show" style="position: fixed; top: 10%; left: 50%; transform: translateX(-50%); z-index: 1050; width: auto;">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            @ViewBag.Message
+        </div>
+    }
+    <script>
+        setTimeout(function () {
+            $('#msg').fadeOut('fast');
+        }, 3000);
+    </script>
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -6,26 +31,74 @@
     <title>@ViewData["Title"] - FarmOps</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/FarmOps.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/CommonPages.css" asp-append-version="true" />
+    <link href="~/font-awesome/css/all.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="~/lib/w2ui/w2ui-2.0.css">
+    @* <link rel="stylesheet" href="~/FarmOps.styles.css" asp-append-version="true" /> *@
+
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript" src="~/lib/w2ui/w2ui-2.0.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FarmOps</a>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
+            <div class="container-fluid bg-white">
+                <a class="navHeading" asp-area="" asp-controller="Home" asp-action="Index">FarmOps</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        
-                    </ul>
-                </div>
+                @if (isLoggedIn){
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
+                            <!-- Home Link -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Home</a>
+                            </li>
+                            <!-- Attendance Link -->
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center" href="@Url.Action("Index", "Attendance")">
+                                    <i class="fas fa-clipboard-list fs-4 mx-1 fw-bold d-none d-md-block"></i> <span>Attendance</span>
+                                </a>
+                            </li>
+                            <!-- Reports Link -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Reports</a>
+                            </li>
+                            <!-- Settings Link -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Settings</a>
+                            </li>
+                            <!-- Help Link -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Help</a>
+                            </li>
+                            <!-- Show Logout button on small screens -->
+                            <li class="nav-item ms-auto d-block d-sm-none">
+                                <form action="@Url.Action("Logout", "Login")" method="post" style="display:inline;">
+                                    <button type="submit" class="btn rev-btn">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                        <!-- Show Logout button on larger screens -->
+                        <form action="@Url.Action("Logout", "Login")" method="post" class="d-none d-sm-inline-flex ms-auto" style="display:inline;">
+                            <button type="submit" class="btn rev-btn">Logout</button>
+                        </form>
+                    </div>
+
+                }else{
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                           
+                    </div>
+                }
+                
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -36,9 +109,6 @@
             &copy; 2024 - FarmOps - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

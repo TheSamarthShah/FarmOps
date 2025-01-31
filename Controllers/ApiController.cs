@@ -1,4 +1,4 @@
-﻿using FarmOps.Models;
+﻿using FarmOps.Models.LoginModels;
 using FarmOps.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -29,12 +29,12 @@ namespace FarmOps.Controllers
             _loginService = loginService;
             _configuration = configuration;
         }
-        [HttpPost("loginapi")]
-        public string Post([FromBody] string value)
+        [HttpPost("login")]
+        public string Post([FromBody] LoginRequest data)
         {
             try
             {
-                LoginRequest data = JsonConvert.DeserializeObject<LoginRequest>(value);
+                //LoginRequest data = JsonConvert.DeserializeObject<LoginRequest>(value);
                 BasicUserDetailModel user = null;
                 if (data != null && data.AccountType != null && data.Email != null && data.Password != null)
                 {
@@ -84,7 +84,7 @@ namespace FarmOps.Controllers
                         base64String = Convert.ToBase64String(imageBytes);
                     }
                         
-                    return JsonConvert.SerializeObject(new { type = "success", statuscode = 200, data = user, profilePic_bas64Str = base64String, token = tokenString });
+                    return JsonConvert.SerializeObject(new { type = "success", statuscode = 200, data = user, token = tokenString, profilePic_bas64Str = base64String });
                 }
                 else
                 {

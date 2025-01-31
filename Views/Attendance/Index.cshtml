@@ -1,0 +1,284 @@
+﻿@model List<FarmOps.Models.AttendanceModels.ModelAttendanceViewRecord>
+
+@{
+    var userType = Context.Session.GetString("FarmOpsUserType");
+
+    var ableToAttendence = false;
+    if(userType == "S" || userType == "M"){
+        ableToAttendence = true;
+    }
+
+}
+@if (ableToAttendence)
+{
+    <div class="main-div">
+        <div class="search-filter">
+            <div class="row">
+                <div class="col-12 col-md-4 col-lg-2 input-text-container my-2 my-lg-0">
+                    <label for="rosterIdTB" class="input-text-label">Roster Id</label>
+                    <input id="rosterIdTB" placeholder="" type="text" class="input-text">
+                </div>
+            <select class="input-select col-12 col-md-4 col-lg-2 my-2 my-lg-0" name="workers" id="workerDrop">
+                <!-- Default option with null check -->
+                <option value="" class="">Select a Worker</option>
+
+                <!-- Iterate over the workers list and generate options -->
+                @foreach (var worker in ViewBag.Workers as List<string>)
+                {
+                    <option value="@worker">@worker</option>
+                }
+            </select>
+
+                <div class="col-12 col-md-4 col-lg-2 my-2 my-lg-0">
+                    <label for="attendanceDate" class="input-date-label">Attendance Date</label>
+                    <input type="date" id="attendanceDate" placeholder="" class="input-date">
+                </div>
+                <button class="col-12 col-md-4 col-lg-1 btn btn-search my-2 my-lg-0">Search</button>
+                <button class="col-12 col-md-4 col-lg-1 ms-md-3 btn btn-addAttendance" data-bs-toggle="modal" data-bs-target="#attendanceModal">Add Attendance</button>
+            </div>
+        </div>
+        <div class="grid-table">
+            <table class="table table-bordered">
+    <thead>
+        <tr>
+            <th width="7%">Attendance ID</th>
+            <th width="5%">Roster ID</th>
+            <th width="7%">Attendance Date</th>
+            <th width="7%">Signin Time</th>
+            <th width="7%">Signout Time</th>
+            <th width="4%">Total Work Hours</th>
+            <th width="4%">Total Break Hours</th>
+            <th width="4%">Pay</th>
+            <th width="4%">Job Category</th>
+            <th width="4%">On Paid Leave</th>
+            <th width="4%">Job Not Paid</th>
+            <th width="7%">Approved Status</th>
+            <th width="7%">Approved By</th>
+            <th width="7%">Sheet Photo</th>
+            <th width="15%">Remarks</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var record in Model)
+        {
+            <tr>
+                <td>@record.AttendanceId</td>
+                <td>@record.RosterId</td>
+                <td>@record.attendDate.ToShortDateString()</td>
+                <td>@record.SigninTime?.ToString(@"hh\:mm")</td>
+                <td>@record.SignoutTime?.ToString(@"hh\:mm")</td>
+                <td>@record.TotalWorkHours</td>
+                <td>@record.TotalBreakHours</td>
+                <td>@record.Pay</td>
+                <td>@record.JobCat</td>
+                <td>@record.OnPaidLeave</td>
+                <td>@record.JobNotPaid</td>
+                <td>@record.ApprovedStatus</td>
+                <td>@record.ApprovedBy</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(record.AttendanceSheetPhoto))
+                    {
+                        <button class="btn btn-info" onclick="window.open('@record.AttendanceSheetPhoto')">Open Photo</button>
+                    }
+                    else
+                    {
+                        <span>No Photo</span>
+                    }
+                </td>
+                <td>@record.Remarks</td>
+            </tr>
+        }
+    </tbody>
+</table>
+        </div>
+    </div>
+}else{
+
+}
+<!-- Modal Structure -->
+<div class="modal fade" data-bs-backdrop="static" id="attendanceModal" tabindex="-1" role="dialog" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="attendanceModalLabel">Add Attendance Entries</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="border:none;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Table to add attendance -->
+                <div class="table-container">
+                    <table class="table" id="attendanceTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%;">Roster ID</th>
+                                <th style="width: 20%;">Sign In Time</th>
+                                <th style="width: 20%;">Sign Out Time</th>
+                                <th style="width: 15%;">Pay</th>
+                                <th style="width: 15%;">On Paid Leave</th>
+                                <th style="width: 15%;">Job Not Paid</th>
+                                <th style="width: 15%;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dynamic rows will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Button to add new row -->
+            </div>
+            <hr />
+            <div class="ms-5">
+                <label for="attendanceDatePop" class="col-2">Attendance Date : </label>
+                <input id="attendanceDatePop" name="attendanceDatePop" type="date" class=" col-sm-12 col-md-4 col-lg-2">
+            </div>
+            <div class="ms-5 mt-2">
+                <label for="attendanceSheetPhoto" class="col-2">Sheet Photo :</label>
+                <input id="attendanceSheetPhoto" name="attendanceSheetPhoto" type="file" class=" col-6">
+            </div>
+            <div class="modal-footer mt-auto">
+                <button type="button" class="btn btn-success me-auto" id="addRowBtn">Add Row</button>
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveAttendanceBtn">Save Attendance</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+	$(document).ready(function() {
+
+			let today = new Date().toISOString().split('T')[0];
+	document.getElementById("attendanceDatePop").setAttribute('max', today);
+		let rootUrl = window.location.href
+		if (rootUrl.includes("?")) {
+			rootUrl = rootUrl.split('?')[0]
+		}
+		if (rootUrl.includes("/Attendance/Index/")) {
+			rootUrl = rootUrl.replace("/Attendance/Index/", "")
+		} else if (rootUrl.includes("/Attendance/Index")) {
+			rootUrl = rootUrl.replace("/Attendance/Index", "")
+		} else if (rootUrl.includes("/Attendance/")) {
+			rootUrl = rootUrl.replace("/Attendance/", "")
+		} else if (rootUrl.includes("/Attendance")) {
+			rootUrl = rootUrl.replace("/Attendance", "")
+		}
+
+		if (rootUrl.charAt(rootUrl.length - 1) != "/") {
+			rootUrl += "/";
+		}
+		console.log(rootUrl + 'Attendance/GetDutyDataJson');
+		$.ajax({
+			url: rootUrl + 'Attendance/GetDutyDataJson',  // URL to your action method
+			type: 'GET',
+			dataType: 'json',
+			success: function(response) {
+				DutyDataJson = response;
+				console.log(DutyDataJson);
+			},
+			error: function(xhr, status, error) {
+				// Handle any error that occurs during the AJAX call
+				alert("An error occurred: " + error);
+			}
+		});
+
+
+            // Add row functionality
+    $('#addRowBtn').click(function() {
+      // Create a new row with empty fields
+      var newRow = `<tr>
+                        <td style="width: 15%;"><input type="number" class="form-control rosterID" placeholder="Roster ID" name="RosterID"></td>
+                        <td><input type="time" class="form-control signinTime"></td>
+                        <td><input type="time" class="form-control signoutTime"></td>
+                        <td style="width: 15%;"><input type="number" class="form-control pay" placeholder="Pay" name="Pay"></td>
+                        <td style="width: 15%;">
+                            <select class="form-control paidLeave" name="OnPaidLeave">
+                                <option value="true">On Paid Leave</option>
+                                <option value="false">Not on Paid Leave</option>
+                            </select>
+                        </td>
+                        <td style="width: 15%;">
+                            <select class="form-control jobNotPaid" name="JobNotPaid">
+                                <option value="true">Job Not Paid</option>
+                                <option value="false">Job Paid</option>
+                            </select>
+                        </td>
+                        <td style="width: 15%;"><button type="button" class="btn btn-danger btn-sm removeRowBtn">Remove</button></td>
+                    </tr>`;
+      // Append the new row to the table
+      $('#attendanceTable tbody').append(newRow);
+    });
+
+    // Remove row functionality
+    $(document).on('click', '.removeRowBtn', function() {
+      $(this).closest('tr').remove();
+    });
+
+    $('#saveAttendanceBtn').on('click', function() {
+            // Read attendance date
+            var attendanceDate = $('#attendanceDatePop').val();
+            
+            // Initialize attendanceSheetPhoto as null
+            var attendanceSheetPhoto = null;
+
+            // Check if the file input exists and if a file has been uploaded
+            var fileInput = $('#attendanceSheetPhoto')[0];
+            if (fileInput && fileInput.files.length > 0) {
+                // Get the uploaded file
+                attendanceSheetPhoto = fileInput.files[0];
+            }
+
+            // Initialize the attendanceData array to store table row data
+            var attendanceData = [];
+
+            // Loop through each row and capture the data
+            $('#attendanceTable tbody tr').each(function() {
+                var rosterID = $(this).find('.rosterID').val();
+                var signInTime = $(this).find('.signinTime').val();
+                var signOutTime = $(this).find('.signoutTime').val();
+                var pay = $(this).find('.pay').val();
+                var onPaidLeave = $(this).find('.paidLeave').is(':checked');
+                var jobNotPaid = $(this).find('.jobNotPaid').is(':checked');
+
+                // Add row data to the list
+                attendanceData.push({
+                    rosterID: rosterID,
+                    signInTime: signInTime,
+                    signOutTime: signOutTime,
+                    pay: pay,
+                    onPaidLeave: onPaidLeave,
+                    jobNotPaid: jobNotPaid
+                });
+            });
+
+            // Add additional fields to the data
+            var attendanceFormData = {
+                AttendanceDate: attendanceDate,
+                AttendanceSheetPhoto: attendanceSheetPhoto,  // If a file is uploaded, this will be populated; otherwise, it will be null
+                AttendanceRecords: attendanceData
+            };
+
+            // Output the collected data (for now, let's log it to the console)
+            console.log(attendanceFormData);
+            $.ajax({
+			    url: rootUrl + 'Attendance/SaveAttendance',  // URL to your action method
+			    type: 'GET',
+			    dataType: 'json',
+                data: {data : JSON.stringify(attendanceFormData)},
+			    success: function(response) {
+                    window.location.reload();
+			    },
+			    error: function(xhr, status, error) {
+				    // Handle any error that occurs during the AJAX call
+				    alert("An error occurred: " + error);
+			    }
+		    });
+            // You can now use this data, for example, send it to the server using AJAX
+            // For demonstration, just clear the table and reset form
+            $('#attendanceTable tbody').empty();
+            $('#attendanceDatePop').val('');
+            $('#attendanceSheetPhoto').val('');
+        });
+	});
+</script>

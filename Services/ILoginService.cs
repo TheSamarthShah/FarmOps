@@ -1,4 +1,4 @@
-﻿using FarmOps.Models;
+﻿using FarmOps.Models.LoginModels;
 
 namespace FarmOps.Services
 {

@@ -1,5 +1,6 @@
 ﻿using FarmOps.Common;
 using FarmOps.Models;
+using FarmOps.Models.LoginModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;

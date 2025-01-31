@@ -1,4 +1,5 @@
 ﻿using FarmOps.Models;
+using FarmOps.Models.LoginModels;
 using FarmOps.Repos;
 using Speckle.Newtonsoft.Json;
 using System.Net;
@@ -7,11 +8,10 @@ namespace FarmOps.Services
 {
     public class LoginService : ILoginService
     {
-        private readonly DBContext _dbContext;
+  
         private readonly ILoginRepository _loginRepository;
-        public LoginService(DBContext dBContext, ILoginRepository loginRepository)
+        public LoginService( ILoginRepository loginRepository)
         {
-            _dbContext = dBContext;
             _loginRepository = loginRepository;
         }
 

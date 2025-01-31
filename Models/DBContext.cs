@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FarmOps.Models.AttendanceModels;
+using FarmOps.Models.LoginModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace FarmOps.Models
 {
@@ -8,5 +10,7 @@ namespace FarmOps.Models
             
         }
         public DbSet<LoginModel> LoginModels { get; set; }
+        public DbSet<AppliedAttendanceTblModel> appliedAttendanceTblModels { get; set; }
+        public DbSet<AttendanceDetailTblModel> attendanceDetailTblModels { get; set; }
     }
 }

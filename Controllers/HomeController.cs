@@ -1,17 +1,17 @@
 using System.Diagnostics;
 using FarmOps.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FarmOps.Controllers
 {
-    public class HomeController : Controller
+    [Authorize]
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly DBContext _dbContext;
-        public HomeController(ILogger<HomeController> logger, DBContext dBContext)
+        public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-            _dbContext = dBContext;
         }
 
         public IActionResult Index()

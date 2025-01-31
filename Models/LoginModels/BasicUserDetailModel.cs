@@ -1,4 +1,4 @@
-﻿namespace FarmOps.Models
+﻿namespace FarmOps.Models.LoginModels
 {
     public class BasicUserDetailModel
     {
