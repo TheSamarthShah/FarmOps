@@ -60,5 +60,12 @@
             VALUES (@RosterID, @AttendanceDate, @SigninTime, @SignoutTime, @TotalWorkHours, 
                     @TotalBreakHours, @BreakIds, @Pay, @JobCat, @OnPaidLeave, @LineId, 
                     @JobNotPaid, @InsertId, @InsertDt, @UpdtId, @UpdtDt);";
+
+        public static string checkLogin = @"SELECT userId 
+                                            FROM tbl_FLogin 
+                                            WHERE emailAddress = @p0 
+                                            AND userPassword = @p1
+                                            AND userType = @p2;
+                                            ";
     }
 }

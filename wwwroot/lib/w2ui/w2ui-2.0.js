@@ -13576,7 +13576,9 @@ class w2grid extends w2base {
                 input.focus()
             }
         }, 10)
+        this.afterEditDone(index, column, event);
     }
+    afterEditDone(index, column, event) { }
     'delete'(force) {
         // event before
         let edata = this.trigger('delete', { target: this.name, force: force })
@@ -19760,7 +19762,7 @@ class w2form extends w2base {
         }
         html = ''
         for (let p = 0; p < pages.length; p++){
-            html += '<div class="w2ui-page page-'+ p +'" style="' + (p !== 0 ? 'display: none;' : '') + this.pageStyle + '">'
+            html += '<div class="/*w2ui-page*/ page-'+ p +'" style="' + (p !== 0 ? 'display: none;' : '') + this.pageStyle + '">'
             if (!pages[p]) {
                 console.log(`ERROR: Page ${p} does not exist`)
                 return false

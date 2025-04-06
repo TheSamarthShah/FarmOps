@@ -45,31 +45,51 @@ namespace FarmOps.Repos
             return nextAttendanceId;
         }
 
-        public string SaveAppliedAttendance(List<AppliedAttendanceTblModel> data)
+        public string SaveAppliedAttendance(List<FAttendanceTbl> data)
         {
-            string insertAttendanceData = @"
-        INSERT INTO tbl_AppliedAttendance (
-AttendanceId,
-            RosterID, 
-            attendDate, 
-            signinTime, 
-            signoutTime, 
-            totalWorkHours, 
-            totalBreakHours, 
-            breakIds, 
-            pay, 
-            job_cat, 
-            on_paid_leave, 
-            lineid, 
-            jobnotpaid, 
-            InsertId, 
-            InsertDt, 
-            UpdtId, 
-            UpdtDt
-        )
-        VALUES (@attendanceId,@RosterID, @AttendanceDate, @SigninTime, @SignoutTime, @TotalWorkHours, 
-                @TotalBreakHours, @BreakIds, @Pay, @JobCat, @OnPaidLeave, @LineId, 
-                @JobNotPaid, @InsertId, @InsertDt, @UpdtId, @UpdtDt);";
+            string insertFAttendanceData = @"
+INSERT INTO tbl_FAttendance (
+    RosterId, 
+    AttendanceDate, 
+    StartTime, 
+    EndTime, 
+    TotalHours, 
+    BreakTime, 
+    BlockId, 
+    Pay, 
+    AttendanceType, 
+    JobId, 
+    PaidBreak, 
+    AttendanceSignPic, 
+    LineId, 
+    JobPaid, 
+    Remarks, 
+    AppliedBy, 
+    ApprovedStatus, 
+    ApprovedBy, 
+    ApprovedDt
+)
+VALUES (
+    @RosterId, 
+    @AttendanceDate, 
+    @StartTime, 
+    @EndTime, 
+    @TotalHours, 
+    @BreakTime, 
+    @BlockId, 
+    @Pay, 
+    @AttendanceType, 
+    @JobId, 
+    @PaidBreak, 
+    @AttendanceSignPic, 
+    @LineId, 
+    @JobPaid, 
+    @Remarks, 
+    @AppliedBy, 
+    @ApprovedStatus, 
+    @ApprovedBy, 
+    @ApprovedDt
+);";
 
             try
             {
@@ -82,28 +102,30 @@ AttendanceId,
                     {
                         try
                         {
-                            foreach (var record in data)
+                            foreach (var record in data)  // Assuming 'data' is your list of FAttendanceTbl objects
                             {
-                                using (var command = new SqlCommand(insertAttendanceData, connection, transaction))
+                                using (var command = new SqlCommand(insertFAttendanceData, connection, transaction))
                                 {
                                     // Add parameters to the command to prevent SQL injection
-                                    command.Parameters.AddWithValue("@attendanceId", record.AttendanceId);
-                                    command.Parameters.AddWithValue("@RosterID", record.RosterID);
+                                    command.Parameters.AddWithValue("@RosterId", record.RosterId);
                                     command.Parameters.AddWithValue("@AttendanceDate", record.AttendanceDate);
-                                    command.Parameters.AddWithValue("@SigninTime", record.SigninTime.HasValue ? (object)record.SigninTime.Value : DBNull.Value);
-                                    command.Parameters.AddWithValue("@SignoutTime", record.SignoutTime.HasValue ? (object)record.SignoutTime.Value : DBNull.Value);
-                                    command.Parameters.AddWithValue("@TotalWorkHours", record.TotalWorkHours.HasValue ? (object)record.TotalWorkHours.Value : DBNull.Value);
-                                    command.Parameters.AddWithValue("@TotalBreakHours", record.TotalBreakHours.HasValue ? (object)record.TotalBreakHours.Value : DBNull.Value);
-                                    command.Parameters.AddWithValue("@BreakIds", string.IsNullOrEmpty(record.BreakIds) ? DBNull.Value : (object)record.BreakIds);
-                                    command.Parameters.AddWithValue("@Pay", record.Pay);
-                                    command.Parameters.AddWithValue("@JobCat", record.JobCat);
-                                    command.Parameters.AddWithValue("@OnPaidLeave", record.OnPaidLeave);
-                                    command.Parameters.AddWithValue("@LineId", record.LineId);
-                                    command.Parameters.AddWithValue("@JobNotPaid", record.JobNotPaid);
-                                    command.Parameters.AddWithValue("@InsertId", "self");
-                                    command.Parameters.AddWithValue("@InsertDt", record.InsertDt);
-                                    command.Parameters.AddWithValue("@UpdtId", string.IsNullOrEmpty(record.UpdtId) ? DBNull.Value : (object)record.UpdtId);
-                                    command.Parameters.AddWithValue("@UpdtDt", record.UpdtDt.HasValue ? (object)record.UpdtDt.Value : DBNull.Value);
+                                    command.Parameters.AddWithValue("@StartTime", record.StartTime);
+                                    command.Parameters.AddWithValue("@EndTime", record.EndTime);
+                                    command.Parameters.AddWithValue("@TotalHours", record.TotalHours.HasValue ? (object)record.TotalHours.Value : DBNull.Value);
+                                    command.Parameters.AddWithValue("@BreakTime", record.BreakTime.HasValue ? (object)record.BreakTime.Value : DBNull.Value);
+                                    command.Parameters.AddWithValue("@BlockId", record.BlockId.HasValue ? (object)record.BlockId.Value : DBNull.Value);
+                                    command.Parameters.AddWithValue("@Pay", record.Pay.HasValue ? (object)record.Pay.Value : DBNull.Value);
+                                    command.Parameters.AddWithValue("@AttendanceType", string.IsNullOrEmpty(record.AttendanceType) ? DBNull.Value : (object)record.AttendanceType);
+                                    command.Parameters.AddWithValue("@JobId", record.JobId.HasValue ? (object)record.JobId.Value : DBNull.Value);
+                                    command.Parameters.AddWithValue("@PaidBreak", record.PaidBreak.HasValue ? (object)record.PaidBreak.Value : DBNull.Value);
+                                    command.Parameters.AddWithValue("@AttendanceSignPic", string.IsNullOrEmpty(record.AttendanceSignPic) ? DBNull.Value : (object)record.AttendanceSignPic);
+                                    command.Parameters.AddWithValue("@LineId", record.LineId.HasValue ? (object)record.LineId.Value : DBNull.Value);
+                                    command.Parameters.AddWithValue("@JobPaid", record.JobPaid);
+                                    command.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(record.Remarks) ? DBNull.Value : (object)record.Remarks);
+                                    command.Parameters.AddWithValue("@AppliedBy", string.IsNullOrEmpty(record.AppliedBy) ? DBNull.Value : (object)record.AppliedBy);
+                                    command.Parameters.AddWithValue("@ApprovedStatus", record.ApprovedStatus);
+                                    command.Parameters.AddWithValue("@ApprovedBy", string.IsNullOrEmpty(record.ApprovedBy) ? DBNull.Value : (object)record.ApprovedBy);
+                                    command.Parameters.AddWithValue("@ApprovedDt", record.ApprovedDt.HasValue ? (object)record.ApprovedDt.Value : DBNull.Value);
 
                                     // Execute the insert command
                                     command.ExecuteNonQuery();
@@ -131,6 +153,7 @@ AttendanceId,
                 Console.WriteLine($"Error during DB connection or transaction: {ex.Message}");
                 throw new ApplicationException($"An error occurred during the database operation: {ex.Message}");
             }
+
         }
 
 

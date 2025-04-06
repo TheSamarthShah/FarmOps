@@ -1417,7 +1417,7 @@ button.w2ui-btn:disabled {
   right: 0;
 }
 .w2ui-form .w2ui-form-header {
-  position: absolute;
+  position: relative;
   top: 0;
   left: 0;
   right: 0;
@@ -1457,7 +1457,7 @@ button.w2ui-btn:disabled {
   background-color: #fcfcfb;
 }
 .w2ui-form .w2ui-page {
-  position: absolute;
+  position: relative;
   left: 0;
   right: 0;
   overflow: auto;
@@ -1492,10 +1492,9 @@ button.w2ui-btn:disabled {
   padding-left: 0px;
 }
 .w2ui-form .w2ui-buttons {
-  position: absolute;
+  position: relative;
   left: 0;
   right: 0;
-  bottom: 0;
   text-align: center;
   border-top: 1px solid #f1f1f1;
   border-bottom: 0px solid #f1f1f1;
@@ -2032,7 +2031,7 @@ textarea.w2ui-error {
   display: none;
   position: absolute;
   z-index: 121;
-  background-color: transparent;
+  background-color: slategrey;
 }
 .w2ui-layout > div .w2ui-resizer:hover,
 .w2ui-layout > div .w2ui-resizer.active {

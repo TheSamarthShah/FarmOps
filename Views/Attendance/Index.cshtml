@@ -1,6 +1,8 @@
-﻿@model List<FarmOps.Models.AttendanceModels.ModelAttendanceViewRecord>
+﻿@* @model List<FarmOps.Models.AttendanceModels.ModelAttendanceViewRecord> *@
 
 @{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
     var userType = Context.Session.GetString("FarmOpsUserType");
 
     var ableToAttendence = false;
@@ -11,7 +13,7 @@
 }
 @if (ableToAttendence)
 {
-    <div class="main-div">
+   @*  <div class="main-div" style="display:none">
         <div class="search-filter">
             <div class="row">
                 <div class="col-12 col-md-4 col-lg-2 input-text-container my-2 my-lg-0">
@@ -91,12 +93,22 @@
     </tbody>
 </table>
         </div>
+    </div> *@
+    <div class="job-based-content" style="display:none">
+        desing work ongoing
+    </div>
+    <div class=" time-based-content">
+        <div id="grid" class="m-2" style="min-height: 50vh;"></div>
+    </div>
+    <div class="attendance-footer">
+        <button id="timeBasedButton">Time Based</button>
+        <button id="jobBasedButton">Job Based</button>
     </div>
 }else{
 
 }
 <!-- Modal Structure -->
-<div class="modal fade" data-bs-backdrop="static" id="attendanceModal" tabindex="-1" role="dialog" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+@* <div class="modal fade" data-bs-backdrop="static" id="attendanceModal" tabindex="-1" role="dialog" aria-labelledby="attendanceModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -145,12 +157,10 @@
         </div>
     </div>
 </div>
-
-<script>
-	$(document).ready(function() {
-
-			let today = new Date().toISOString().split('T')[0];
-	document.getElementById("attendanceDatePop").setAttribute('max', today);
+ *@
+<script src="./js/Attendance.js"></script>
+		@* let today = new Date().toISOString().split('T')[0];
+	    document.getElementById("attendanceDatePop").setAttribute('max', today);
 		let rootUrl = window.location.href
 		if (rootUrl.includes("?")) {
 			rootUrl = rootUrl.split('?')[0]
@@ -184,10 +194,10 @@
 		});
 
 
-            // Add row functionality
-    $('#addRowBtn').click(function() {
-      // Create a new row with empty fields
-      var newRow = `<tr>
+        // Add row functionality
+        $('#addRowBtn').click(function() {
+         // Create a new row with empty fields
+        var newRow = `<tr>
                         <td style="width: 15%;"><input type="number" class="form-control rosterID" placeholder="Roster ID" name="RosterID"></td>
                         <td><input type="time" class="form-control signinTime"></td>
                         <td><input type="time" class="form-control signoutTime"></td>
@@ -280,5 +290,4 @@
             $('#attendanceDatePop').val('');
             $('#attendanceSheetPhoto').val('');
         });
-	});
-</script>
+ *@

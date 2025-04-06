@@ -5,7 +5,7 @@ namespace FarmOps.Repos
 {
     public interface IAttendanceRepository
     {
-        public string SaveAppliedAttendance(List<AppliedAttendanceTblModel> data);
+        public string SaveAppliedAttendance(List<FAttendanceTbl> data);
         public string SaveAttendanceDetails(AttendanceDetailTblModel data);
 
         public DataTable GetAssignedWorkers(string ClmName, string UserId);

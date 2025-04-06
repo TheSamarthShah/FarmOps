@@ -1,4 +1,5 @@
 ﻿using FarmOps.Common;
+using FarmOps.Controllers;
 using FarmOps.Models.AttendanceModels;
 using FarmOps.Repos;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -6,45 +7,81 @@ using System.Data;
 
 namespace FarmOps.Services
 {
-    public class AttendanceService : IAttendanceService
+    public class AttendanceService 
     {
         private readonly IAttendanceRepository _attendanceRepository;
+        private readonly string _attendanceSignsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "AppData", "AttendanceSigns");
         public AttendanceService(IAttendanceRepository attendanceRepository)
         {
             _attendanceRepository = attendanceRepository;
         }
-        public string SaveAttendance(AttendaceInsertModel data)
+        public string SaveTimeAttendance(List<TimeAttendanceInsert> data)
         {
-            List<AppliedAttendanceTblModel> AppliedData = new List<AppliedAttendanceTblModel>();
-            AttendanceDetailTblModel AttendanceDetails = new AttendanceDetailTblModel();
-            AppliedData = data.AttendanceRecords.Select(record => new AppliedAttendanceTblModel
-            {
-                RosterID = record.RosterID,
-                SigninTime = string.IsNullOrEmpty(record.SignInTime) ? (TimeOnly?)null : TimeOnly.Parse(record.SignInTime),
-                SignoutTime = string.IsNullOrEmpty(record.SignOutTime) ? (TimeOnly?)null : TimeOnly.Parse(record.SignOutTime),
-                Pay = record.Pay ?? 0, // If Pay is null, you can set it to a default value (e.g., 0)
-                OnPaidLeave = record.OnPaidLeave,
-                JobNotPaid = record.JobNotPaid,
-
-                // Setting other properties to default or null values
-                AttendanceId = _attendanceRepository.GetNextAttendanceId(),   // Nullable
-                TotalWorkHours = null, // Nullable
-                TotalBreakHours = null, // Nullable
-                BreakIds = null,       // Nullable
-                JobCat = 0,            // Default value, you can change it accordingly
-                LineId = 0,            // Default value, you can change it accordingly
-                InsertId = null,       // Nullable
-                InsertDt = DateTime.Now,  // Default to current date and time
-                UpdtId = null,         // Nullable
-                UpdtDt = null,         // Nullable
-                AttendanceDate = data.AttendanceDate // Default to current date
+            List<FAttendanceTbl> AttendanceTbl = data.Select(item =>{
+                string attendanceSignPicPath = SaveAttendanceSignPic(item);
+                return new FAttendanceTbl
+                {
+                    RosterId = item.RosterId,
+                    AttendanceDate = item.AttendanceDate,
+                    StartTime = item.StartTime,
+                    EndTime = item.EndTime,
+                    TotalHours = item.TotalHours,
+                    BreakTime = item.BreakTime,
+                    BlockId = item.BlockId,
+                    Pay = item.Pay,
+                    AttendanceType = "Time", // Assuming you want to leave this null as it's not part of TimeAttendanceInsert model
+                    JobId = null, // Assuming no mapping for JobId, if needed, you can adjust this
+                    PaidBreak = null, // Assuming no mapping for PaidBreak, if needed, you can adjust this
+                    AttendanceSignPic = attendanceSignPicPath,
+                    LineId = item.LineId,
+                    JobPaid = item.JobPaid,
+                    Remarks = item.Remarks,
+                    AppliedBy = item.AppliedBy,
+                    ApprovedStatus = item.ApprovedStatus, // Default to 0 if null
+                    ApprovedBy = item.ApprovedBy,
+                    ApprovedDt = item.ApprovedDt
+                };
             }).ToList();
 
-            _attendanceRepository.SaveAppliedAttendance(AppliedData);
+            _attendanceRepository.SaveAppliedAttendance(AttendanceTbl);
 
             return "success";
         }
+        // Method to save base64 string as a PNG file
+        private string SaveAttendanceSignPic(TimeAttendanceInsert item)
+        {
+            if (string.IsNullOrEmpty(item.AttendanceSignPic))
+            {
+                return null; // No picture to save
+            }
 
+            try
+            {
+                // Create the AttendanceSigns directory if it doesn't exist
+                if (!Directory.Exists(_attendanceSignsDirectory))
+                {
+                    Directory.CreateDirectory(_attendanceSignsDirectory);
+                }
+
+                // Decode the base64 string to byte array
+                byte[] imageBytes = Convert.FromBase64String(item.AttendanceSignPic);
+
+                // Generate the file name based on RosterId, AttendanceDate, StartTime, and EndTime
+                string fileName = $"{item.RosterId}_{item.AttendanceDate:yyyyMMdd}_{item.StartTime:hhmm}_{item.EndTime:hhmm}.png";
+                string filePath = Path.Combine(_attendanceSignsDirectory, fileName);
+
+                // Save the byte array as a PNG file
+                File.WriteAllBytes(filePath, imageBytes);
+
+                return fileName; // Return the saved file path
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                Console.WriteLine($"Error saving AttendanceSignPic: {ex.Message}");
+                return null; // Return null if an error occurs
+            }
+        }
         public List<string> GetRelatedWorkers(string UserType, string UserId)
         {
             var clmName = "supervisorId";

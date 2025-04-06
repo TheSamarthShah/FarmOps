@@ -32,7 +32,7 @@ builder.Services.AddScoped<IAttendanceRepository>(provider =>
     return new AttendanceRepository(dbContext, connectionString);
 });
 builder.Services.AddScoped<ILoginService, LoginService>();
-builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+builder.Services.AddScoped<AttendanceService>();
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

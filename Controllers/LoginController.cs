@@ -27,41 +27,23 @@ namespace FarmOps.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(LoginViewModel data)
         {
-            BasicUserDetailModel user = null;
-            string accType = "";
             try
             {
+                LoginModel userData = new();
                 if (data != null && data.AccountType != null && data.Email != null && data.Password != null)
                 {
-                    accType = data.AccountType;
-                    if (data.AccountType == "S")
-                    {
-                        data.AccountType = "Supervisor";
-                    }
-                    else if (data.AccountType == "W")
-                    {
-                        data.AccountType = "Worker";
-                    }
-                    else if (data.AccountType == "C")
-                    {
-                        data.AccountType = "Contractor";
-                    }
-                    else
-                    {
-                        data.AccountType = "Monitor";
-                    }
-                    user = _loginService.verifyLogin(data.AccountType, data.Email, data.Password);
+                    userData = _loginService.verifyLogin(data.AccountType, data.Email, data.Password);
                 }
-                if (user.Email != null)
+                if (userData.EmailAddress != null)
                 {
-                    HttpContext.Session.SetString("FarmOpsUserEmail", user.Email);
-                    HttpContext.Session.SetString("FarmOpsUserId", user.Id);
-                    HttpContext.Session.SetString("FarmOpsUserType", accType);
+                    HttpContext.Session.SetString("FarmOpsUserEmail", userData.EmailAddress);
+                    HttpContext.Session.SetString("FarmOpsUserId", userData.UserId);
+                    HttpContext.Session.SetString("FarmOpsUserType", userData.UserType);
 
                     var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.Email)
-                };
+                    {
+                        new Claim(ClaimTypes.Name, userData.UserId)
+                    };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -73,10 +55,11 @@ namespace FarmOps.Controllers
                 }
                 ViewBag.Message = "Invalid username or password. Please try again.";
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 ViewBag.Message = "Opps! Something went wrong. Please try again later.";
             }
-            
+
             return View();
         }
 

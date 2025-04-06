@@ -10,8 +10,8 @@ namespace FarmOps.Controllers
     [Authorize]
     public class AttendanceController : BaseController
     {
-        private readonly IAttendanceService _attendanceService;
-        public AttendanceController(IAttendanceService attendanceService)
+        private readonly AttendanceService _attendanceService;
+        public AttendanceController(AttendanceService attendanceService)
         {
             _attendanceService = attendanceService;
             var viewModel = new AttendaceInsertModel
@@ -30,9 +30,9 @@ namespace FarmOps.Controllers
                 var userType = GetUserType();
                 var userId = GetUserId();
 
-                workers = _attendanceService.GetRelatedWorkers(userType, userId);
+                //workers = _attendanceService.GetRelatedWorkers(userType, userId);
 
-                allAttendanceData = _attendanceService.GetAllAttendanceData(userType, userId);
+                //allAttendanceData = _attendanceService.GetAllAttendanceData(userType, userId);
             }
             catch (Exception ex)
             {
@@ -46,26 +46,45 @@ namespace FarmOps.Controllers
             
             return View(allAttendanceData);
         }
-        
-        public IActionResult SaveAttendance(string data)
+
+        [HttpPost]
+        public IActionResult SaveTimeAttendance([FromBody] List<TimeAttendanceInsert> attendanceFormData)
         {
             try
             {
-                var attendanceInsertModel = JsonConvert.DeserializeObject<AttendaceInsertModel>(data);
-                _attendanceService.SaveAttendance(attendanceInsertModel);
-            }
-            catch (Exception ex) {
-                ViewBag.Message = "[Faliure] - Opps! Something went wrong. Please try again later.";
-            }
+                if (attendanceFormData == null || !attendanceFormData.Any())
+                {
+                    return BadRequest(new { Success = false, Message = "No data provided." });
+                }
 
-            var response = new
+                // If there are any validation issues with the received data, you can handle them here
+                var validationErrors = attendanceFormData
+                    .SelectMany((d, i) =>
+                        !ModelState.IsValid
+                        ? ModelState.Values.SelectMany(v => v.Errors)
+                            .Select(e => $"Row {i + 1}: {e.ErrorMessage}")
+                        : Array.Empty<string>())
+                    .ToList();
+
+                if (validationErrors.Any())
+                {
+                    return BadRequest(new
+                    {
+                        Success = false,
+                        Message = "Validation failed",
+                        Errors = validationErrors
+                    });
+                }
+
+                // Call the service to save the attendance data
+                _attendanceService.SaveTimeAttendance(attendanceFormData);
+
+                return Ok(new { Success = true, Message = $"Saved {attendanceFormData.Count} records successfully" });
+            }
+            catch (Exception ex)
             {
-                Success = true,
-                Message = "Attendance saved successfully!"
-            };
-
-            // Return success response
-            return Ok(response);
+                return StatusCode(500, new { Success = false, Message = "An error occurred while saving attendance data: " + ex.Message });
+            }
         }
 
         public string GetDutyDataJson()

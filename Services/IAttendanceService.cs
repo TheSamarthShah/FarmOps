@@ -5,7 +5,7 @@ namespace FarmOps.Services
 {
     public interface IAttendanceService
     {
-        public string SaveAttendance(AttendaceInsertModel data);
+        public string SaveTimeAttendance(List<TimeAttendanceInsert> data);
 
         public List<string> GetRelatedWorkers (string UserType, string UserId);
 

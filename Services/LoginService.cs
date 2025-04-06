@@ -15,10 +15,10 @@ namespace FarmOps.Services
             _loginRepository = loginRepository;
         }
 
-        public BasicUserDetailModel verifyLogin(string type, string email, string password)
+        public LoginModel verifyLogin(string type, string email, string password)
         {
-            BasicUserDetailModel user = _loginRepository.GetUserForLogin(type, email, password);
-                return user;   
+            LoginModel user = _loginRepository.GetUserForLogin(type, email, password);
+            return user;   
         }
     }
 }
